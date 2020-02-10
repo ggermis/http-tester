@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/yaml.v2"
 	"codenut.org/http-tester/pkg/http_tester/cli"
 	"codenut.org/http-tester/pkg/http_tester/trace"
+	"gopkg.in/yaml.v2"
 )
 
 func nullOutputter() Outputter {
@@ -17,9 +17,9 @@ func nullOutputter() Outputter {
 
 func detailOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
-		for i := range queue.Data {
-			data, _ := yaml.Marshal(&i)
-			if i.Status == cli.Option.StatusCode {
+		for c := range queue.Data {
+			data, _ := yaml.Marshal(&c)
+			if c.Status == cli.Option.StatusCode {
 				fmt.Printf("---\n%s\n", data)
 			} else {
 				_, _ = fmt.Fprintf(os.Stderr, "---\n%s\n", data)
@@ -31,11 +31,11 @@ func detailOutputter() Outputter {
 
 func dotOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
-		for i := range queue.Data {
-			if i.Status == cli.Option.StatusCode {
+		for c := range queue.Data {
+			if c.Status == cli.Option.StatusCode {
 				fmt.Print(".")
 			} else {
-				fmt.Print(fmt.Sprintf("[%d]", i.Status))
+				fmt.Print(fmt.Sprintf("[%d]", c.Status))
 			}
 		}
 		queue.Done <- true
@@ -44,9 +44,9 @@ func dotOutputter() Outputter {
 
 func csvOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
-		for i := range queue.Data {
+		for c := range queue.Data {
 			fmt.Printf("%03d-%06d,%s,%s,%d,%t,%0.2f\n",
-				i.ThreadId, i.RequestId, i.Method, i.Url, i.Status, i.TlsHandshake, i.Duration)
+				c.ThreadId, c.RequestId, c.Method, c.Url, c.Status, c.TlsHandshake, c.Duration)
 		}
 		queue.Done <- true
 	}

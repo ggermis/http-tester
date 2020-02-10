@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	"gopkg.in/yaml.v2"
 	"codenut.org/http-tester/pkg/http_tester/cli"
+	"gopkg.in/yaml.v2"
 )
 
 type Task struct {
