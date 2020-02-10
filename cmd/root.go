@@ -3,8 +3,8 @@ package cmd
 import (
 	"log"
 
-	"codenut.org/http-tester/pkg/http_tester"
-	"codenut.org/http-tester/pkg/http_tester/cli"
+	"github.com/ggermis/http-tester/pkg/http_tester"
+	"github.com/ggermis/http-tester/pkg/http_tester/cli"
 	"github.com/spf13/cobra"
 )
 

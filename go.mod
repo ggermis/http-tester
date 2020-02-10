@@ -1,4 +1,4 @@
-module codenut.org/http-tester
+module github.com/ggermis/http-tester
 
 go 1.13
 

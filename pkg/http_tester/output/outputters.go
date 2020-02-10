@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"codenut.org/http-tester/pkg/http_tester/cli"
-	"codenut.org/http-tester/pkg/http_tester/trace"
+	"github.com/ggermis/http-tester/pkg/http_tester/cli"
+	"github.com/ggermis/http-tester/pkg/http_tester/trace"
 	"gopkg.in/yaml.v2"
 )
 

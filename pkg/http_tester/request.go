@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"codenut.org/http-tester/pkg/http_tester/input"
-	"codenut.org/http-tester/pkg/http_tester/trace"
+	"github.com/ggermis/http-tester/pkg/http_tester/input"
+	"github.com/ggermis/http-tester/pkg/http_tester/trace"
 )
 
 func httpRequestFactory() []*http.Request {

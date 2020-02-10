@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"codenut.org/http-tester/pkg/http_tester/cli"
+	"github.com/ggermis/http-tester/pkg/http_tester/cli"
 	"gopkg.in/yaml.v2"
 )
 

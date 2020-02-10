@@ -1,7 +1,7 @@
 package main
 
 import (
-	"codenut.org/http-tester/cmd"
+	"github.com/ggermis/http-tester/cmd"
 )
 
 func main() {

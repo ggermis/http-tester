@@ -11,7 +11,7 @@ ifdef BUILD_NR
 VERSION       := "$(VERSION).$(BUILD_NR)"
 endif
 
-LDFLAGS       := -ldflags "-s -w -X codenut.org/http-tester/pkg/http_tester.version=${VERSION}"
+LDFLAGS       := -ldflags "-s -w -X github.com/ggermis/http-tester/pkg/http_tester.version=${VERSION}"
 
 all: clean build
 

@@ -1,8 +1,8 @@
 package output
 
 import (
-	"codenut.org/http-tester/pkg/http_tester/cli"
-	"codenut.org/http-tester/pkg/http_tester/trace"
+	"github.com/ggermis/http-tester/pkg/http_tester/cli"
+	"github.com/ggermis/http-tester/pkg/http_tester/trace"
 )
 
 type Outputter func(*trace.CaptureQueue)
