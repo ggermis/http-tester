@@ -28,7 +28,9 @@ func (o *Options) HeadersAsMap() map[string]string {
 	x := map[string]string{}
 	for _, header := range o.Headers {
 		h := strings.Split(header, ":")
-		x[strings.TrimSpace(h[0])] = strings.TrimSpace(h[1])
+		if len(h) == 2 {
+			x[strings.TrimSpace(h[0])] = strings.TrimSpace(h[1])
+		}
 	}
 	return x
 }
