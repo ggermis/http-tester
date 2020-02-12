@@ -215,7 +215,6 @@ To perform 5 sequential calls
 
 ```
 $ http-tester -u https://site.codenut.org/some/path -n 5
-
 ```
 
 To perform 5 sequential calls per thread using 3 threads (15 calls in total)
