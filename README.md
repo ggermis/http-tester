@@ -214,14 +214,14 @@ $ http-tester -u https://www.google.be -o detail
 To perform 5 sequential calls
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -n 5
+$ http-tester -u https://site.codenut.org/some/path -n 5
 
 ```
 
 To perform 5 sequential calls per thread using 3 threads (15 calls in total)
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -n 5 -c 3
+$ http-tester -u https://site.codenut.org/some/path -n 5 -c 3
 ```
 
 Perform requests at randomized intervals to distribute better. The following example will perform 2500 HTTP calls to 
@@ -231,7 +231,7 @@ this case it will wait anywhere from 0-500ms on each request. Randomized for eac
 request
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -n 50 -c 50 -r 500
+$ http-tester -u https://site.codenut.org/some/path -n 50 -c 50 -r 500
 ```
 
 ### Output
@@ -246,7 +246,7 @@ Default outputter is `dot`
 Example
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -n 2 -o detail
+$ http-tester -u https://site.codenut.org/some/path -n 2 -o detail
 ```
 
 ### Log only errors
@@ -255,13 +255,13 @@ all detail outputs that do not return the expected HTTP status code are written 
 to a file for examination
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -n 342 -c 121 -o detail 2>/tmp/errors.log
+$ http-tester -u https://site.codenut.org/some/path -n 342 -c 121 -o detail 2>/tmp/errors.log
 ```
 
 ### Custom headers
 
 ```
-http-tester trace -u https://site.codenut.org/some/path -o detail -H X-A=test -H X-B='string with spaces'
+$ http-tester -u https://site.codenut.org/some/path -o detail -H X-A=test -H X-B='string with spaces'
 ```
 
 ### Scenario
@@ -294,5 +294,5 @@ YAML file per request
 The following command wil perform 4 actual HTTP requests (2 from the YAML file * request count)
 
 ```
-$ http-tester trace -f scenario.yml -n 2 -o csv
+$ http-tester -f scenario.yml -n 2 -o csv
 ```
