@@ -33,7 +33,11 @@ func dotOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
 			if c.Status == cli.Option.StatusCode {
-				fmt.Print(".")
+				if int(c.Duration) >= cli.Option.SlowRequests {
+					fmt.Print("S")
+				} else {
+					fmt.Print(".")
+				}
 			} else {
 				fmt.Print(fmt.Sprintf("[%d]", c.Status))
 			}
