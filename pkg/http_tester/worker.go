@@ -24,7 +24,6 @@ func start() {
 func newWorkerThread(threadId int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	resolver := NewResolver()
 	queue := trace.NewCaptureQueue()
 
 	go output.NewOutputter()(queue)
