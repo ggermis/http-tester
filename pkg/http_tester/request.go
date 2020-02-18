@@ -26,7 +26,7 @@ func httpRequestFactory() []*http.Request {
 	return requests
 }
 
-func doTracedHttpRequest(req *http.Request, cap *trace.Capture) *trace.Capture {
+func doTracedHttpRequest(client *http.Client, req *http.Request, cap *trace.Capture) *trace.Capture {
 	res, err := client.Do(cap.StartTrace(req))
 	if err != nil {
 		log.Panic(err)

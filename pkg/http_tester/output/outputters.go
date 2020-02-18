@@ -18,11 +18,13 @@ func nullOutputter() Outputter {
 func detailOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
-			data, _ := yaml.Marshal(&c)
-			if c.Status == cli.Option.StatusCode {
-				fmt.Printf("---\n%s\n", data)
-			} else {
-				_, _ = fmt.Fprintf(os.Stderr, "---\n%s\n", data)
+			if cli.Option.SlowRequests < 0 || (cli.Option.SlowRequests > 0 && int(c.Duration) >= cli.Option.SlowRequests) {
+				data, _ := yaml.Marshal(&c)
+				if c.Status == cli.Option.StatusCode {
+					fmt.Printf("---\n%s\n", data)
+				} else {
+					_, _ = fmt.Fprintf(os.Stderr, "---\n%s\n", data)
+				}
 			}
 		}
 		queue.Done <- true
@@ -33,7 +35,7 @@ func dotOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
 			if c.Status == cli.Option.StatusCode {
-				if int(c.Duration) >= cli.Option.SlowRequests {
+				if cli.Option.SlowRequests > 0 && int(c.Duration) >= cli.Option.SlowRequests {
 					fmt.Print("S")
 				} else {
 					fmt.Print(".")
@@ -49,8 +51,8 @@ func dotOutputter() Outputter {
 func csvOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
-			fmt.Printf("%03d-%06d,%s,%s,%d,%t,%0.2f\n",
-				c.ThreadId, c.RequestId, c.Method, c.Url, c.Status, c.TlsHandshake, c.Duration)
+			fmt.Printf("%03d-%06d,%s,%s,%s,%d,%t,%0.2f\n",
+				c.ThreadId, c.RequestId, c.IpAddress, c.Method, c.Url, c.Status, c.TlsHandshake, c.Duration)
 		}
 		queue.Done <- true
 	}

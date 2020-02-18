@@ -29,6 +29,7 @@ type Capture struct {
 	RequestId    int
 	Method       string
 	Url          string
+	IpAddress    string
 	Start        time.Time
 	Status       int
 	Duration     float64

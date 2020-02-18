@@ -21,23 +21,22 @@ func isValidOutputFormat(outputFormat string) bool {
 }
 
 type Options struct {
-	NumberOfThreads   int
-	NumberOfRequests  int
-	Url               string
-	Wait              int
-	OutputFormat      string
-	ForceTLSHandshake bool
-	Randomize         int
-	Method            string
-	Headers           []string
-	Data              string
-	StatusCode        int
-	InputFile         string
-	Timeout           int
-	BucketSize        int
-	Quiet             bool
-	ShowVersion       bool
-	SlowRequests      int
+	NumberOfThreads  int
+	NumberOfRequests int
+	Url              string
+	Wait             int
+	OutputFormat     string
+	Randomize        int
+	Method           string
+	Headers          []string
+	Data             string
+	StatusCode       int
+	InputFile        string
+	Timeout          int
+	BucketSize       int
+	Quiet            bool
+	ShowVersion      bool
+	SlowRequests     int
 }
 
 func (o *Options) HeadersAsMap() map[string]string {
