@@ -16,23 +16,18 @@ import (
 var resolver *Resolver
 
 func init() {
-	resolver = NewResolver()
+	resolver = &Resolver{r: net.Resolver{PreferGo: true}, hosts: map[string][]string{}}
+	go func() {
+		for range time.Tick(5 * time.Second) {
+			resolver.refresh()
+		}
+	}()
 }
 
 type Resolver struct {
 	r     net.Resolver
 	mu    sync.Mutex
 	hosts map[string][]string
-}
-
-func NewResolver() *Resolver {
-	resolver := &Resolver{r: net.Resolver{PreferGo: true}, hosts: map[string][]string{}}
-	go func() {
-		for range time.Tick(5 * time.Second) {
-			resolver.refresh()
-		}
-	}()
-	return resolver
 }
 
 func (m *Resolver) DialContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {

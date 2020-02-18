@@ -8,8 +8,8 @@ import (
 )
 
 func init() {
-	setMaxOpenFiles()
 	rand.Seed(time.Now().UnixNano())
+	setMaxOpenFiles()
 	go signalHandler()
 }
 

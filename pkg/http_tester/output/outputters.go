@@ -18,12 +18,13 @@ func nullOutputter() Outputter {
 func detailOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
-			if cli.Option.SlowRequests < 0 || (cli.Option.SlowRequests > 0 && int(c.Duration) >= cli.Option.SlowRequests) {
+			if c.Status != cli.Option.StatusCode {
 				data, _ := yaml.Marshal(&c)
-				if c.Status == cli.Option.StatusCode {
+				_, _ = fmt.Fprintf(os.Stderr, "---\n%s\n", data)
+			} else {
+				if cli.Option.SlowRequests < 0 || (cli.Option.SlowRequests > 0 && int(c.Duration) >= cli.Option.SlowRequests) {
+					data, _ := yaml.Marshal(&c)
 					fmt.Printf("---\n%s\n", data)
-				} else {
-					_, _ = fmt.Fprintf(os.Stderr, "---\n%s\n", data)
 				}
 			}
 		}
