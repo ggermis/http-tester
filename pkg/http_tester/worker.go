@@ -38,7 +38,8 @@ func newWorkerThread(threadId int, wg *sync.WaitGroup) {
 			client := &http.Client{
 				Timeout: time.Duration(cli.Option.Timeout) * time.Second,
 				Transport: &http.Transport{
-					DialContext: resolver.DialContext(request.URL.Host, capture),
+					ForceAttemptHTTP2: true,
+					DialContext:       resolver.DialContext(request.URL.Host, capture),
 				},
 			}
 			queue.Data <- doTracedHttpRequest(client, request, capture)
