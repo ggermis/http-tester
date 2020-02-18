@@ -24,7 +24,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&cli.Option.BucketSize, "bucket-size", "b", 50, "Request time statistics bucket size in ms")
 	rootCmd.PersistentFlags().BoolVarP(&cli.Option.ShowVersion, "version", "v", false, "Show version")
 	rootCmd.PersistentFlags().BoolVarP(&cli.Option.Quiet, "quiet", "q", false, "Be quiet")
-	rootCmd.PersistentFlags().IntVar(&cli.Option.SlowRequests, "slow-requests", 15000, "Indicate slow requests in the dot outputter with an 'S'. Specified in ms")
+	rootCmd.PersistentFlags().IntVar(&cli.Option.SlowRequests, "slow-requests", -1, "Indicate slow requests in the dot outputter with an 'S'. Specified in ms")
 }
 
 var rootCmd = &cobra.Command{
