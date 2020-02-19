@@ -9,12 +9,14 @@ const (
 	OUTPUT_DETAIL = "detail"
 	OUTPUT_DOT    = "dot"
 	OUTPUT_CSV    = "csv"
+	OUTPUT_SIMPLE = "simple"
+	OUTPUT_SPLIT  = "split"
 	OUTPUT_NULL   = "null"
 )
 
 func isValidOutputFormat(outputFormat string) bool {
 	switch outputFormat {
-	case OUTPUT_DETAIL, OUTPUT_DOT, OUTPUT_CSV, OUTPUT_NULL:
+	case OUTPUT_DETAIL, OUTPUT_DOT, OUTPUT_CSV, OUTPUT_SIMPLE, OUTPUT_SPLIT, OUTPUT_NULL:
 		return true
 	}
 	return false

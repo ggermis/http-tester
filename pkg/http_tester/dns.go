@@ -20,7 +20,7 @@ var resolver *Resolver
 func init() {
 	resolver = &Resolver{r: net.Resolver{PreferGo: true}, hosts: map[string][]net.IPAddr{}}
 	go func() {
-		for range time.Tick(5 * time.Second) {
+		for range time.Tick(60 * time.Second) {
 			resolver.refresh()
 		}
 	}()
@@ -32,54 +32,31 @@ type Resolver struct {
 	hosts map[string][]net.IPAddr
 }
 
-func (r *Resolver) DialContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {
-	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		separator := strings.LastIndex(addr, ":")
-		port, _ := strconv.Atoi(addr[separator+1:])
-
-		cap.RecordAction("DNSStart", network, addr)
-		ip := r.mustResolve(host)
-		cap.RecordAction("DNSDone", ip.String())
-
-		cap.IpAddress = ip.String()
-
-		cap.RecordAction("DialTCPStart")
-		conn, err := net.DialTCP(network, nil, &net.TCPAddr{IP: ip.IP, Port: port, Zone: ip.Zone})
-		if err != nil {
-			log.Panic(err)
-		}
-		cap.RecordAction("DialTCPDone")
-
-		return conn, err
-	}
-}
-
 func (r *Resolver) DialTLS(host string, cap *trace.Capture) func(network, addr string) (net.Conn, error) {
 	return func(network, addr string) (net.Conn, error) {
 		separator := strings.LastIndex(addr, ":")
 		port, _ := strconv.Atoi(addr[separator+1:])
 
-		cap.RecordAction("DNSStart", network, addr)
+		cap.RecordAction(trace.TraceMark, network, addr)
+
 		ip := r.mustResolve(host)
-		cap.RecordAction("DNSDone", ip.String())
+		cap.RecordAction(trace.TraceDns, ip.String())
 
 		cap.IpAddress = ip.String()
 
-		cap.RecordAction("DialTCPStart")
 		raw, err := net.DialTCP(network, nil, &net.TCPAddr{IP: ip.IP, Port: port, Zone: ip.Zone})
 		if err != nil {
 			log.Panic(err)
 		}
-		cap.RecordAction("DialTCPDone")
+		cap.RecordAction(trace.TraceDialTCP)
 
 		conn := tls.Client(raw, &tls.Config{ServerName: addr[:separator], MinVersion: tls.VersionTLS12})
 
-		cap.RecordAction("HandshakeStart")
 		err = conn.Handshake()
 		if err != nil {
 			log.Panic(err)
 		}
-		cap.RecordAction("HandshakeDone", fmt.Sprintf("%+v", conn.ConnectionState()))
+		cap.RecordAction(trace.TraceTLSHandshake, fmt.Sprintf("%+v", conn.ConnectionState()))
 
 		return conn, err
 	}

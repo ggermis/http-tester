@@ -1,71 +1,46 @@
 package trace
 
 import (
-	"net/http"
+	"fmt"
 	"net/http/httptrace"
-	"time"
+	"net/textproto"
+)
 
-	"github.com/ggermis/http-tester/pkg/http_tester/cli"
+const (
+	TraceStart        = "Start"
+	TraceMark         = "MarkCustom"
+	TraceDns          = "DNS"
+	TraceDialTCP      = "DialTCP"
+	TraceTLSHandshake = "TLSHandshake"
+	TraceFinish       = "Finished"
 )
 
 func init() {
 	s = summary{distribution: map[int]int{}, response: map[int]int{}}
 }
 
-type CaptureQueue struct {
-	Data chan *Capture
-	Done chan bool
-}
-
-func NewCaptureQueue() *CaptureQueue {
-	var queue CaptureQueue
-	queue.Data = make(chan *Capture, cli.Option.NumberOfRequests)
-	queue.Done = make(chan bool, 1)
-	return &queue
-}
-
-type Capture struct {
-	ThreadId     int
-	RequestId    int
-	Method       string
-	Url          string
-	IpAddress    string
-	Start        time.Time
-	Status       int
-	Duration     float64
-	Headers      []string
-	Data         string
-	Actions      []Action
-}
-
-type Action struct {
-	Name     string
-	Params   []interface{}
-	Duration float64
-	Total    float64
-}
-
-func (c *Capture) StartTrace(req *http.Request) *http.Request {
-	if cli.Option.OutputFormat == cli.OUTPUT_DETAIL {
-		req = req.WithContext(httptrace.WithClientTrace(req.Context(), createTraceConfig(c)))
+func createTraceConfig(cap *Capture) *httptrace.ClientTrace {
+	return &httptrace.ClientTrace{
+		GetConn:              func(hostPort string) { cap.RecordAction("GetConn", hostPort) },
+		GotConn:              func(i httptrace.GotConnInfo) { cap.RecordAction("GotConn", i) },
+		PutIdleConn:          func(err error) { cap.RecordAction("PutIdleConn", err) },
+		GotFirstResponseByte: func() { cap.RecordAction("GotFirstResponseByte") },
+		Got100Continue:       func() { cap.RecordAction("Got100Continue") },
+		Got1xxResponse: func(code int, header textproto.MIMEHeader) error {
+			cap.RecordAction("Got1xxResponse", code, header)
+			return nil
+		},
+		DNSStart:     func(i httptrace.DNSStartInfo) { cap.RecordAction("DNSStart", i.Host) },
+		DNSDone:      func(i httptrace.DNSDoneInfo) { cap.RecordAction("DNSDone", i.Addrs) },
+		ConnectStart: func(network, addr string) { cap.RecordAction("ConnectStart", network, addr) },
+		ConnectDone: func(network, addr string, err error) {
+			cap.RecordAction("ConnectDone", network, addr, err)
+		},
+		WroteHeaderField: func(key string, value []string) {
+			cap.RecordAction("WroteHeaderField", fmt.Sprintf("%s", key), fmt.Sprintf("%v", value))
+		},
+		WroteHeaders:    func() { cap.RecordAction("WroteHeaders") },
+		Wait100Continue: func() { cap.RecordAction("Wait100Continue") },
+		WroteRequest:    func(i httptrace.WroteRequestInfo) { cap.RecordAction("WroteRequest", i) },
 	}
-	c.Start = time.Now()
-	c.RecordAction("Trace started")
-	return req
-}
-
-func (c *Capture) StopTrace(status int) {
-	c.Status = status
-	c.Duration = c.RecordAction("Trace finished")
-	defer s.registerCall(c)
-}
-
-func (c *Capture) RecordAction(name string, params ...interface{}) float64 {
-	duration := float64(time.Since(c.Start)) / float64(time.Millisecond)
-	action := Action{Name: name, Total: duration, Params: params}
-	if len(c.Actions) > 0 {
-		action.Duration = action.Total - c.Actions[len(c.Actions)-1].Total
-	}
-	c.Actions = append(c.Actions, action)
-	return duration
 }

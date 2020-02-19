@@ -1,7 +1,6 @@
 package http_tester
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -31,9 +30,7 @@ func doTracedHttpRequest(client *http.Client, req *http.Request, cap *trace.Capt
 	if err != nil {
 		log.Panic(err)
 	}
-	for key, value := range res.Header {
-		cap.Headers = append(cap.Headers, fmt.Sprintf("%s: %s", key, value))
-	}
+	cap.Headers = res.Header
 	if data, err := ioutil.ReadAll(res.Body); err == nil {
 		cap.Data = string(data)
 	}
