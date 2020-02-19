@@ -22,7 +22,7 @@ func init() {
 func createTraceConfig(cap *Capture) *httptrace.ClientTrace {
 	return &httptrace.ClientTrace{
 		GetConn:              func(hostPort string) { cap.RecordAction("GetConn", hostPort) },
-		GotConn:              func(i httptrace.GotConnInfo) { cap.RecordAction("GotConn", i) },
+		GotConn:              func(info httptrace.GotConnInfo) { cap.RecordAction("GotConn", fmt.Sprintf("%+v", info)) },
 		PutIdleConn:          func(err error) { cap.RecordAction("PutIdleConn", err) },
 		GotFirstResponseByte: func() { cap.RecordAction("GotFirstResponseByte") },
 		Got100Continue:       func() { cap.RecordAction("Got100Continue") },
