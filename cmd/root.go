@@ -13,7 +13,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&cli.Option.NumberOfThreads, "concurrent", "c", 1, "Number of threads to spin up")
 	rootCmd.PersistentFlags().StringVarP(&cli.Option.Url, "url", "u", "", "URL to call")
 	rootCmd.PersistentFlags().IntVarP(&cli.Option.Wait, "wait", "w", 0, "Time to wait between sequential calls (in ms)")
-	rootCmd.PersistentFlags().StringVarP(&cli.Option.OutputFormat, "output", "o", cli.OUTPUT_DOT, "Output format to use. (dot, csv, detail, simple, split, null)")
+	rootCmd.PersistentFlags().StringVarP(&cli.Option.OutputFormat, "output", "o", cli.OUTPUT_DOT, "Output format to use. (dot, csv, detail, line, split, null)")
 	rootCmd.PersistentFlags().IntVarP(&cli.Option.Randomize, "randomize", "r", 0, "Perform HTTP calls within random intervals between 0 and the specified number of milliseconds")
 	rootCmd.PersistentFlags().StringVarP(&cli.Option.Method, "method", "X", "GET", "HTTP method to use")
 	rootCmd.PersistentFlags().StringSliceVarP(&cli.Option.Headers, "headers", "H", []string{}, "Headers to pass (key=value). Can be specified multiple times")

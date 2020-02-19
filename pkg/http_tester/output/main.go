@@ -15,8 +15,8 @@ func NewOutputter() Outputter {
 		return nullOutputter()
 	case cli.OUTPUT_CSV:
 		return csvOutputter()
-	case cli.OUTPUT_SIMPLE:
-		return simpleOutputter()
+	case cli.OUTPUT_LINE:
+		return lineOutputter()
 	case cli.OUTPUT_SPLIT:
 		return splitOutputter()
 	}

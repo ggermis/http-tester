@@ -65,7 +65,7 @@ func csvOutputter() Outputter {
 	}
 }
 
-func simpleOutputter() Outputter {
+func lineOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
 			if cli.Option.SlowRequests < 0 || (cli.Option.SlowRequests > 0 && int(c.Duration) >= cli.Option.SlowRequests) {
