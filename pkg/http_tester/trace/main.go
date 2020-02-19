@@ -33,7 +33,6 @@ type Capture struct {
 	Start        time.Time
 	Status       int
 	Duration     float64
-	TlsHandshake bool
 	Headers      []string
 	Data         string
 	Actions      []Action
@@ -51,17 +50,17 @@ func (c *Capture) StartTrace(req *http.Request) *http.Request {
 		req = req.WithContext(httptrace.WithClientTrace(req.Context(), createTraceConfig(c)))
 	}
 	c.Start = time.Now()
-	c.recordAction("Trace started")
+	c.RecordAction("Trace started")
 	return req
 }
 
 func (c *Capture) StopTrace(status int) {
 	c.Status = status
-	c.Duration = c.recordAction("Trace finished")
+	c.Duration = c.RecordAction("Trace finished")
 	defer s.registerCall(c)
 }
 
-func (c *Capture) recordAction(name string, params ...interface{}) float64 {
+func (c *Capture) RecordAction(name string, params ...interface{}) float64 {
 	duration := float64(time.Since(c.Start)) / float64(time.Millisecond)
 	action := Action{Name: name, Total: duration, Params: params}
 	if len(c.Actions) > 0 {

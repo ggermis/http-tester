@@ -9,31 +9,30 @@ import (
 
 func createTraceConfig(cap *Capture) *httptrace.ClientTrace {
 	return &httptrace.ClientTrace{
-		GetConn:              func(hostPort string) { cap.recordAction("GetConn", hostPort) },
-		GotConn:              func(i httptrace.GotConnInfo) { cap.recordAction("GotConn", i) },
-		PutIdleConn:          func(err error) { cap.recordAction("PutIdleConn", err) },
-		GotFirstResponseByte: func() { cap.recordAction("GotFirstResponseByte") },
-		Got100Continue:       func() { cap.recordAction("Got100Continue") },
+		GetConn:              func(hostPort string) { cap.RecordAction("GetConn", hostPort) },
+		GotConn:              func(i httptrace.GotConnInfo) { cap.RecordAction("GotConn", i) },
+		PutIdleConn:          func(err error) { cap.RecordAction("PutIdleConn", err) },
+		GotFirstResponseByte: func() { cap.RecordAction("GotFirstResponseByte") },
+		Got100Continue:       func() { cap.RecordAction("Got100Continue") },
 		Got1xxResponse: func(code int, header textproto.MIMEHeader) error {
-			cap.recordAction("Got1xxResponse", code, header)
+			cap.RecordAction("Got1xxResponse", code, header)
 			return nil
 		},
-		DNSStart:     func(i httptrace.DNSStartInfo) { cap.recordAction("DNSStart", i.Host) },
-		DNSDone:      func(i httptrace.DNSDoneInfo) { cap.recordAction("DNSDone", i.Addrs) },
-		ConnectStart: func(network, addr string) { cap.recordAction("ConnectStart", network, addr) },
+		DNSStart:     func(i httptrace.DNSStartInfo) { cap.RecordAction("DNSStart", i.Host) },
+		DNSDone:      func(i httptrace.DNSDoneInfo) { cap.RecordAction("DNSDone", i.Addrs) },
+		ConnectStart: func(network, addr string) { cap.RecordAction("ConnectStart", network, addr) },
 		ConnectDone: func(network, addr string, err error) {
-			cap.recordAction("ConnectDone", network, addr, err)
+			cap.RecordAction("ConnectDone", network, addr, err)
 		},
-		TLSHandshakeStart: func() { cap.recordAction("TLSHandshakeStart") },
+		TLSHandshakeStart: func() { cap.RecordAction("TLSHandshakeStart") },
 		TLSHandshakeDone: func(state tls.ConnectionState, err error) {
-			cap.TlsHandshake = true
-			cap.recordAction("TLSHandshakeDone", fmt.Sprintf("%+v", state), err)
+			cap.RecordAction("TLSHandshakeDone", fmt.Sprintf("%+v", state), err)
 		},
 		WroteHeaderField: func(key string, value []string) {
-			cap.recordAction("WroteHeaderField", fmt.Sprintf("%s", key), fmt.Sprintf("%v", value))
+			cap.RecordAction("WroteHeaderField", fmt.Sprintf("%s", key), fmt.Sprintf("%v", value))
 		},
-		WroteHeaders:    func() { cap.recordAction("WroteHeaders") },
-		Wait100Continue: func() { cap.recordAction("Wait100Continue") },
-		WroteRequest:    func(i httptrace.WroteRequestInfo) { cap.recordAction("WroteRequest", i) },
+		WroteHeaders:    func() { cap.RecordAction("WroteHeaders") },
+		Wait100Continue: func() { cap.RecordAction("Wait100Continue") },
+		WroteRequest:    func(i httptrace.WroteRequestInfo) { cap.RecordAction("WroteRequest", i) },
 	}
 }
