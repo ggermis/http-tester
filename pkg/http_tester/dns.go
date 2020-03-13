@@ -32,8 +32,8 @@ type Resolver struct {
 	hosts map[string][]net.IPAddr
 }
 
-func (r *Resolver) DialTLS(host string, cap *trace.Capture) func(network, addr string) (net.Conn, error) {
-	return func(network, addr string) (net.Conn, error) {
+func (r *Resolver) DialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
 		separator := strings.LastIndex(addr, ":")
 		port, _ := strconv.Atoi(addr[separator+1:])
 
