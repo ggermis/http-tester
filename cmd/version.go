@@ -11,7 +11,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Show version of this tool",
+	Short: "Show version",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		http_tester.ShowVersion()
