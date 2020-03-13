@@ -241,6 +241,7 @@ Default outputter is `dot`
 * `dot`: Prints a `.` for each successfull request (HTTP status 200). It will print the response code otherwise
 * `csv`: Print CSV data per request. Can be used for graphing
 * `detail`: Print the full trace of every HTTP request
+* `split`: Split total response time into connection and response
 
 Example
 
