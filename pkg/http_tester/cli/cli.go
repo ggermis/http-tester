@@ -37,7 +37,6 @@ type Options struct {
 	Timeout          int
 	BucketSize       int
 	Quiet            bool
-	ShowVersion      bool
 	SlowRequests     int
 }
 
@@ -53,9 +52,6 @@ func (o *Options) HeadersAsMap() map[string]string {
 }
 
 func (o *Options) Validate() error {
-	if Option.ShowVersion {
-		return nil
-	}
 	if Option.Url == "" && Option.InputFile == "" {
 		return errors.New("URL is a required parameter")
 	}

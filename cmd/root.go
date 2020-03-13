@@ -22,7 +22,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&cli.Option.InputFile, "file", "f", "", "Input file containing HTTP calls to run in sequence on each thread")
 	rootCmd.PersistentFlags().IntVar(&cli.Option.Timeout, "timeout", 30, "HTTP client timeout in seconds")
 	rootCmd.PersistentFlags().IntVarP(&cli.Option.BucketSize, "bucket-size", "b", 50, "Request time statistics bucket size in ms")
-	rootCmd.PersistentFlags().BoolVarP(&cli.Option.ShowVersion, "version", "v", false, "Show version")
 	rootCmd.PersistentFlags().BoolVarP(&cli.Option.Quiet, "quiet", "q", false, "Be quiet")
 	rootCmd.PersistentFlags().IntVar(&cli.Option.SlowRequests, "slow-requests", -1, "Indicate slow requests in the dot outputter with an 'S'. Specified in ms")
 }
@@ -36,11 +35,7 @@ var rootCmd = &cobra.Command{
 	},
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if cli.Option.ShowVersion {
-			http_tester.ShowVersion()
-		} else {
-			http_tester.StartWithStatistics()
-		}
+		http_tester.StartWithStatistics()
 	},
 }
 
