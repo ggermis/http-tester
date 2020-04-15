@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/ggermis/http-tester/pkg/http_tester"
 	"github.com/spf13/cobra"
 )
@@ -14,6 +16,6 @@ var versionCmd = &cobra.Command{
 	Short: "Show version",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		http_tester.ShowVersion()
+		fmt.Println(http_tester.Version)
 	},
 }

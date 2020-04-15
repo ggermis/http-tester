@@ -1,3 +1,3 @@
 package http_tester
 
-var version = "ad-hoc"
+var Version = "ad-hoc"
