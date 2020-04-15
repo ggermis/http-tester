@@ -2,9 +2,7 @@ package http_tester
 
 import (
 	"math/rand"
-	"net/http"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/ggermis/http-tester/pkg/http_tester/cli"
@@ -32,21 +30,7 @@ func newWorkerThread(threadId int, wg *sync.WaitGroup) {
 		if cli.Option.Randomize > 0 {
 			time.Sleep(time.Duration(rand.Intn(cli.Option.Randomize)) * time.Millisecond)
 		}
-
-		for _, request := range httpRequestFactory() {
-			capture := &trace.Capture{ThreadId: threadId, RequestId: i, Method: request.Method, Url: request.URL.String()}
-			client := &http.Client{
-				Timeout: time.Duration(cli.Option.Timeout) * time.Second,
-				Transport: &http.Transport{
-					ForceAttemptHTTP2: true,
-					DialTLSContext:    resolver.DialTLSContext(request.Host, capture),
-				},
-			}
-			queue.Data <- doTracedHttpRequest(client, request, capture)
-			atomic.AddInt64(&stats.ctr, 1)
-			client.CloseIdleConnections()
-		}
-
+		doHttpRequest(threadId, i, queue)
 		if cli.Option.Wait > 0 {
 			time.Sleep(time.Duration(cli.Option.Wait) * time.Millisecond)
 		}
