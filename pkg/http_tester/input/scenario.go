@@ -40,8 +40,8 @@ func (s Scenario) interpolate(t *Task) {
 	t.Method = s.Interpolator.Interpolate(t.Method)
 	t.Url = s.Interpolator.Interpolate(t.Url)
 	t.Data = s.Interpolator.Interpolate(t.Data)
-	for key, value := range t.Headers {
-		t.Headers[key] = s.Interpolator.Interpolate(t.Headers[value])
+	for key := range t.Headers {
+		t.Headers[key] = s.Interpolator.Interpolate(t.Headers[key])
 	}
 }
 
