@@ -15,53 +15,53 @@ import (
 
 	"github.com/ggermis/http-tester/pkg/http_tester/cli"
 	"github.com/ggermis/http-tester/pkg/http_tester/input"
+	"github.com/ggermis/http-tester/pkg/http_tester/interpolator"
 	"github.com/ggermis/http-tester/pkg/http_tester/trace"
 )
 
-func httpRequestFactory() []*http.Request {
-	var requests []*http.Request
-	for _, scenario := range input.LoadScenario() {
-		req, err := http.NewRequest(scenario.Method, scenario.Url, strings.NewReader(scenario.Data))
-		if err != nil {
-			log.Panic(err)
-		}
-		for key, value := range scenario.Headers {
-			req.Header.Set(key, value)
-		}
-		requests = append(requests, req)
-	}
-	return requests
-}
-
-func doTracedHttpRequest(client *http.Client, req *http.Request, cap *trace.Capture) *trace.Capture {
-	res, err := client.Do(cap.StartTrace(req))
-	if err != nil {
-		log.Panic(err)
-	}
-	cap.Headers = res.Header
-	if data, err := ioutil.ReadAll(res.Body); err == nil {
-		cap.Data = string(data)
-	}
-	_ = res.Body.Close()
-	cap.StopTrace(res.StatusCode)
-
-	return cap
+type HttpRequest struct {
+	threadId  int
+	requestId int
+	scenario  *input.Scenario
+	task      *input.Task
 }
 
 func doHttpRequest(threadId, requestId int, queue *trace.CaptureQueue) {
-	for _, request := range httpRequestFactory() {
-		capture := &trace.Capture{ThreadId: threadId, RequestId: requestId, Method: request.Method, Url: request.URL.String()}
-		client := &http.Client{
-			Timeout: time.Duration(cli.Option.Timeout) * time.Second,
-			Transport: &http.Transport{
-				ForceAttemptHTTP2: true,
-				DialTLSContext:    dialTLSContext(request.Host, capture),
-			},
-		}
-		queue.Data <- doTracedHttpRequest(client, request, capture)
+	scenario := input.LoadScenario()
+	for _, task := range scenario.Tasks {
+		queue.Data <- doTracedHttpRequest(&HttpRequest{threadId: threadId, requestId: requestId, scenario: &scenario, task: task})
 		atomic.AddInt64(&stats.ctr, 1)
-		client.CloseIdleConnections()
 	}
+}
+
+func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
+	request := r.task.AsRequest(r.scenario)
+
+	capture := &trace.Capture{ThreadId: r.threadId, RequestId: r.requestId, Method: request.Method, Url: request.URL.String()}
+	client := &http.Client{
+		Timeout: time.Duration(cli.Option.Timeout) * time.Second,
+		Transport: &http.Transport{
+			ForceAttemptHTTP2: true,
+			DialTLSContext:    dialTLSContext(request.Host, capture),
+		},
+	}
+	defer client.CloseIdleConnections()
+
+	res, err := client.Do(capture.StartTrace(request))
+	if err != nil {
+		log.Panic(err)
+	}
+	capture.Headers = res.Header
+	if data, err := ioutil.ReadAll(res.Body); err == nil {
+		capture.Data = string(data)
+		for key, value := range interpolator.NewParser(res.Header.Get("Content-Type")).Parse(capture.Data, r.task.Variables) {
+			r.scenario.Interpolator.Register(key, value)
+		}
+	}
+	_ = res.Body.Close()
+	capture.StopTrace(res.StatusCode)
+
+	return capture
 }
 
 func dialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {
