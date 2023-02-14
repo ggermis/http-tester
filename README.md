@@ -269,26 +269,24 @@ $ http-tester -u https://site.codenut.org/some/path -o detail -H X-A=test -H X-B
 It is possible to list HTTP calls in a YAML file. The semantics of the `-n` flag changes slightly. It will run all calls defined in the
 YAML file per request
 
-```
-- method: GET
-  url: https://site.codenut.org/some/path
-  headers:
-   X-A: a
-   X-B: c d e
-  data: |-
-    some data
-    to
-    send
+When a `JSON` response is detected, the data is parsed and can be referenced in subsequent calls using `jsonpath` syntax. In the below 
+example we do an oauth call and use the `access_token` that was returned in the next call
 
-- method: PUT
-  url: https://site.codenut.org/some/other/path
+```
+- method: POST
+  url: https://api.example.com/oauth/token
   headers:
-   X-B: a
-   X-C: adfc d e
+    Authorization: Basic dGVzdDp0ZXN0
+    Content-Type: application/x-www-form-urlencoded
   data: |-
-    some other data
-    to
-    send
+    grant_type=password&username=my.user@example.com&password=mypassword
+  variables:
+    access_token: $.access_token
+- method: GET
+  url: https://api.example.com/mobile/users/me
+  headers:
+    Authorization: Bearer ${access_token}
+    Content-Type: application/json
 ```
 
 The following command wil perform 4 actual HTTP requests (2 from the YAML file * request count)

@@ -3,8 +3,8 @@ package interpolator
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/yalp/jsonpath"
+	"mime"
 )
 
 type Parser interface {
@@ -12,7 +12,8 @@ type Parser interface {
 }
 
 func NewParser(mimeType string) Parser {
-	switch mimeType {
+	mediaType, _, _ := mime.ParseMediaType(mimeType)
+	switch mediaType {
 	case "application/json":
 		return &JSONParser{}
 	}
