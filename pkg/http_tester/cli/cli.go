@@ -38,6 +38,7 @@ type Options struct {
 	BucketSize       int
 	Quiet            bool
 	SlowRequests     int
+	Http2            bool
 }
 
 func (o *Options) HeadersAsMap() map[string]string {

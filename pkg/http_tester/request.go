@@ -40,18 +40,30 @@ func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
 
 	capture := &trace.Capture{ThreadId: r.threadId, RequestId: r.requestId, Method: request.Method, Url: request.URL.String()}
 
-	client := &http.Client{
-		Timeout: time.Duration(cli.Option.Timeout) * time.Second,
-		Transport: &http2.Transport{
-			AllowHTTP:      false,
-			DialTLSContext: dialTLSContext(request.Host, capture),
-		},
+	var client *http.Client
+	if cli.Option.Http2 {
+		client = &http.Client{
+			Timeout: time.Duration(cli.Option.Timeout) * time.Second,
+			Transport: &http2.Transport{
+				AllowHTTP: false,
+			},
+		}
+	} else {
+		client = &http.Client{
+			Timeout: time.Duration(cli.Option.Timeout) * time.Second,
+			Transport: &http.Transport{
+				ForceAttemptHTTP2: true,
+				DialTLSContext:    dialTLSContextHttp1(request.Host, capture),
+			},
+		}
 	}
+
 	defer client.CloseIdleConnections()
 
 	res, err := client.Do(capture.StartTrace(request))
 	if err != nil {
 		capture.StopTrace(-1)
+		log.Panic(err)
 		return capture
 	}
 	capture.Proto = res.Proto
@@ -68,8 +80,8 @@ func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
 	return capture
 }
 
-func dialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
-	return func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
+func dialTLSContextHttp1(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
 		separator := strings.LastIndex(addr, ":")
 		port, _ := strconv.Atoi(addr[separator+1:])
 
