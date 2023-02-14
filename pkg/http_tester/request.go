@@ -63,7 +63,6 @@ func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
 	res, err := client.Do(capture.StartTrace(request))
 	if err != nil {
 		capture.StopTrace(-1)
-		log.Panic(err)
 		return capture
 	}
 	capture.Proto = res.Proto
