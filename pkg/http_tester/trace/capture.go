@@ -23,6 +23,7 @@ func NewCaptureQueue() *CaptureQueue {
 type Capture struct {
 	ThreadId  int
 	RequestId int
+	Proto     string
 	Method    string
 	Url       string
 	IpAddress string

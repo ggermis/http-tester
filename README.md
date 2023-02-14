@@ -1,7 +1,7 @@
 # Http-tester
 
 ```
-$ go run main.go trace -n 1 -c 1 -u https://site.codenut.org/some/path
+$ go run main.go -n 1 -c 1 -u https://site.codenut.org/some/path
 ```
 
 Uses `httptrace.ClientTrace` to track progress from the HTTP call

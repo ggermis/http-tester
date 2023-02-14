@@ -58,8 +58,8 @@ func dotOutputter() Outputter {
 func csvOutputter() Outputter {
 	return func(queue *trace.CaptureQueue) {
 		for c := range queue.Data {
-			fmt.Printf("%03d-%06d,%s,%s,%s,%d,%0.2f\n",
-				c.ThreadId, c.RequestId, c.IpAddress, c.Method, c.Url, c.Status, c.Duration)
+			fmt.Printf("%03d-%06d,%s,%s,%s,%s,%d,%0.2f\n",
+				c.ThreadId, c.RequestId, c.Proto, c.IpAddress, c.Method, c.Url, c.Status, c.Duration)
 		}
 		queue.Done <- true
 	}

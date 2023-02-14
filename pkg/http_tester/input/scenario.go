@@ -1,9 +1,9 @@
 package input
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/ggermis/http-tester/pkg/http_tester/cli"
@@ -61,7 +61,7 @@ func LoadScenario() Scenario {
 }
 
 func loadScenarioFromFile(filename string) Scenario {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}

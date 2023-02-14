@@ -4,7 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"golang.org/x/net/http2"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -38,21 +39,24 @@ func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
 	request := r.task.AsRequest(r.scenario)
 
 	capture := &trace.Capture{ThreadId: r.threadId, RequestId: r.requestId, Method: request.Method, Url: request.URL.String()}
+
 	client := &http.Client{
 		Timeout: time.Duration(cli.Option.Timeout) * time.Second,
-		Transport: &http.Transport{
-			ForceAttemptHTTP2: true,
-			DialTLSContext:    dialTLSContext(request.Host, capture),
+		Transport: &http2.Transport{
+			AllowHTTP:      false,
+			DialTLSContext: dialTLSContext(request.Host, capture),
 		},
 	}
 	defer client.CloseIdleConnections()
 
 	res, err := client.Do(capture.StartTrace(request))
 	if err != nil {
-		log.Panic(err)
+		capture.StopTrace(-1)
+		return capture
 	}
+	capture.Proto = res.Proto
 	capture.Headers = res.Header
-	if data, err := ioutil.ReadAll(res.Body); err == nil {
+	if data, err := io.ReadAll(res.Body); err == nil {
 		capture.Data = string(data)
 		for key, value := range interpolator.NewParser(res.Header.Get("Content-Type")).Parse(capture.Data, r.task.Variables) {
 			r.scenario.Interpolator.Register(key, value)
@@ -64,8 +68,8 @@ func doTracedHttpRequest(r *HttpRequest) *trace.Capture {
 	return capture
 }
 
-func dialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string) (net.Conn, error) {
-	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+func dialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
+	return func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
 		separator := strings.LastIndex(addr, ":")
 		port, _ := strconv.Atoi(addr[separator+1:])
 
@@ -89,7 +93,6 @@ func dialTLSContext(host string, cap *trace.Capture) func(ctx context.Context, n
 			log.Panic(err)
 		}
 		cap.RecordAction(trace.TraceTLSHandshake, fmt.Sprintf("%+v", conn.ConnectionState()))
-
 		return conn, err
 	}
 }
